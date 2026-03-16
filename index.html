@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Attendance Tracker</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-top">
+                <h1 class="site-title">Attendance Tracker</h1>
+                <div class="header-location">
+                    The Nueva School
+                    <div class="settings-wrapper">
+                        <button class="settings-btn" id="settingsBtn" title="Settings">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="3"></circle>
+                                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                            </svg>
+                        </button>
+                        <div class="settings-dropdown hidden" id="settingsDropdown">
+                            <button class="settings-option" id="clearDataBtn">Clear All Data</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <nav>
+                <ul class="nav-menu">
+                    <li><a class="nav-link active" data-page="import">Import</a></li>
+                    <li><a class="nav-link" data-page="table">Data</a></li>
+                    <li><a class="nav-link" data-page="thresholds">Thresholds</a></li>
+                    <li><a class="nav-link" data-page="emailTemplates">Email Templates</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <!-- Import Page -->
+        <div class="page-view active" id="importPage">
+            <div class="section-wrapper">
+                <div class="import-grid">
+                    <!-- Attendance Data Upload Section -->
+                    <div class="import-column">
+                        <h2 class="section-title">Attendance Data</h2>
+                        <div class="upload-section" id="uploadSectionAttendance">
+                            <input type="file" id="csvFileAttendance" accept=".csv">
+                            <label for="csvFileAttendance">
+                                Drag & drop attendance CSV file here, or <span>click to browse</span>
+                            </label>
+                        </div>
+
+                        <!-- Attendance Import Success Section -->
+                        <div class="import-success" id="importSuccessAttendance">
+                            <div class="success-header">
+                                <h2 class="success-title">&#10003; Import Successful</h2>
+                                <div class="import-timestamp" id="timestampAttendance"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Course Enrollments Upload Section -->
+                    <div class="import-column">
+                        <h2 class="section-title">All Course Enrollments</h2>
+                        <div class="upload-section" id="uploadSectionEnrollments">
+                            <input type="file" id="csvFileEnrollments" accept=".csv">
+                            <label for="csvFileEnrollments">
+                                Drag & drop course enrollments CSV file here, or <span>click to browse</span>
+                            </label>
+                        </div>
+
+                        <!-- Enrollments Import Success Section -->
+                        <div class="import-success" id="importSuccessEnrollments">
+                            <div class="success-header">
+                                <h2 class="success-title">&#10003; Import Successful</h2>
+                                <div class="import-timestamp" id="timestampEnrollments"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Table Page -->
+        <div class="page-view" id="tablePage">
+            <div class="section-wrapper">
+                <!-- Table View Tabs -->
+                <nav class="table-tabs">
+                    <button class="table-tab active" data-table="attendance">Attendance Records</button>
+                    <button class="table-tab" data-table="enrollments">Course Enrollments</button>
+                </nav>
+
+                <!-- Attendance Records View -->
+                <div class="table-view active" id="attendanceView">
+                <!-- Search Section -->
+                <div class="search-section hidden" id="searchSection">
+                    <div class="search-input-wrapper">
+                        <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <path d="m21 21-4.35-4.35"></path>
+                        </svg>
+                        <input type="text" id="searchInput" placeholder="Search by name, course, teacher, comment..." autocomplete="off">
+                        <button class="search-clear" id="searchClear" type="button" aria-label="Clear search">&times;</button>
+                    </div>
+                    <span class="search-hint" id="searchHint"></span>
+                </div>
+
+                <!-- Filter Section -->
+                <div class="filter-section hidden" id="filterSection">
+                    <span class="filter-label">Filter</span>
+                    
+                    <div class="filter-group">
+                        <label>Start:</label>
+                        <input type="date" id="filterStartDate">
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label>End:</label>
+                        <input type="date" id="filterEndDate">
+                    </div>
+                    
+                    <div class="filter-group">
+                        <select id="filterGrade">
+                            <option value="">All Grades</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <select id="filterType">
+                            <option value="">All Types</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <select id="filterBlock">
+                            <option value="">All Blocks</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <select id="filterTeacher">
+                            <option value="">All Teachers</option>
+                        </select>
+                    </div>
+
+                    <button class="btn-clear" id="btnClear">Clear</button>
+                    <button class="btn-apply" id="btnApply">Apply Filter</button>
+                </div>
+
+                <!-- Table Section -->
+                <div class="table-section hidden" id="tableSection">
+                    <div class="table-header">
+                        <h2>Attendance</h2>
+                        <span class="record-count" id="recordCount">0 records</span>
+                    </div>
+                    
+                    <!-- Pagination Controls (Top) -->
+                    <div class="pagination pagination-top hidden" id="paginationTop">
+                        <button class="pagination-btn pagination-prev-top" disabled>Previous</button>
+                        <span class="pagination-info-top">Page 1 of 1</span>
+                        <button class="pagination-btn pagination-next-top" disabled>Next</button>
+                    </div>
+                    
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th data-sort="studentName">Student Name <span class="sort-icon"></span></th>
+                                    <th data-sort="Grade">Grade <span class="sort-icon"></span></th>
+                                    <th data-sort="Attendance_Date">Date <span class="sort-icon"></span></th>
+                                    <th data-sort="Type">Type <span class="sort-icon"></span></th>
+                                    <th data-sort="Excuse">Excuse <span class="sort-icon"></span></th>
+                                    <th data-sort="Comment">Comment <span class="sort-icon"></span></th>
+                                    <th data-sort="Course">Course <span class="sort-icon"></span></th>
+                                    <th data-sort="Block">Block <span class="sort-icon"></span></th>
+                                    <th data-sort="Teacher_Last">Teacher <span class="sort-icon"></span></th>
+                                </tr>
+                            </thead>
+                            <tbody id="tableBody">
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="empty-state hidden" id="emptyState">
+                        <p>No records match your filters.</p>
+                    </div>
+                    
+                    <!-- Pagination Controls (Bottom) -->
+                    <div class="pagination pagination-bottom hidden" id="paginationBottom">
+                        <button class="pagination-btn pagination-prev-bottom" disabled>Previous</button>
+                        <span class="pagination-info-bottom">Page 1 of 1</span>
+                        <button class="pagination-btn pagination-next-bottom" disabled>Next</button>
+                    </div>
+                </div>
+                </div>
+                <!-- End Attendance Records View -->
+
+                <!-- Course Enrollments View -->
+                <div class="table-view" id="enrollmentsView">
+                    <!-- Enrollments Search Section -->
+                    <div class="search-section hidden" id="enrollmentsSearchSection">
+                        <div class="search-input-wrapper">
+                            <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="11" cy="11" r="8"></circle>
+                                <path d="m21 21-4.35-4.35"></path>
+                            </svg>
+                            <input type="text" id="enrollmentsSearchInput" placeholder="Search by name, course, teacher, block..." autocomplete="off">
+                            <button class="search-clear" id="enrollmentsSearchClear" type="button" aria-label="Clear search">&times;</button>
+                        </div>
+                        <span class="search-hint" id="enrollmentsSearchHint"></span>
+                    </div>
+
+                    <!-- Enrollments Table Section -->
+                    <div class="table-section hidden" id="enrollmentsTableSection">
+                        <div class="table-header">
+                            <h2>Course Enrollments</h2>
+                            <span class="record-count" id="enrollmentsRecordCount">0 records</span>
+                        </div>
+                        
+                        <!-- Pagination Controls (Top) -->
+                        <div class="pagination pagination-top hidden" id="enrollmentsPaginationTop">
+                            <button class="pagination-btn pagination-prev-top-enrollments" disabled>Previous</button>
+                            <span class="pagination-info-top-enrollments">Page 1 of 1</span>
+                            <button class="pagination-btn pagination-next-top-enrollments" disabled>Next</button>
+                        </div>
+                        
+                        <div class="table-wrapper">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th data-sort-enrollments="studentName">Student Name <span class="sort-icon"></span></th>
+                                        <th data-sort-enrollments="Grade">Grade <span class="sort-icon"></span></th>
+                                        <th data-sort-enrollments="Course">Course <span class="sort-icon"></span></th>
+                                        <th data-sort-enrollments="Block">Block <span class="sort-icon"></span></th>
+                                        <th data-sort-enrollments="Teacher_Last">Teacher <span class="sort-icon"></span></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="enrollmentsTableBody">
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="empty-state hidden" id="enrollmentsEmptyState">
+                            <p>No enrollment data available. Please import course enrollments data.</p>
+                        </div>
+                        
+                        <!-- Pagination Controls (Bottom) -->
+                        <div class="pagination pagination-bottom hidden" id="enrollmentsPaginationBottom">
+                            <button class="pagination-btn pagination-prev-bottom-enrollments" disabled>Previous</button>
+                            <span class="pagination-info-bottom-enrollments">Page 1 of 1</span>
+                            <button class="pagination-btn pagination-next-bottom-enrollments" disabled>Next</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- End Course Enrollments View -->
+            </div>
+        </div>
+
+        <!-- Thresholds Page -->
+        <div class="page-view" id="thresholdsPage">
+            <div class="section-wrapper">
+                <h2 class="section-title">Absence Thresholds</h2>
+                
+                <!-- Threshold View Tabs -->
+                <nav class="table-tabs hidden" id="thresholdTabs">
+                    <button class="table-tab active" data-threshold-view="attention">Needs Attention</button>
+                    <button class="table-tab" data-threshold-view="history">History</button>
+                </nav>
+                
+                <!-- Needs Attention View -->
+                <div class="threshold-view active" id="attentionView">
+                    <div class="table-section hidden" id="thresholdsTableSection">
+                        <div class="table-header">
+                            <span class="record-count" id="thresholdsRecordCount">0 students</span>
+                        </div>
+                        
+                        <div class="table-wrapper">
+                            <table id="thresholdsTable">
+                                <thead>
+                                    <tr>
+                                        <th>Student Name</th>
+                                        <th>Grade</th>
+                                        <th>Block 1</th>
+                                        <th>Block 2</th>
+                                        <th>Block 3</th>
+                                        <th>Block 4</th>
+                                        <th>Block 5</th>
+                                        <th>Block 6</th>
+                                        <th>Block 7</th>
+                                        <th>Block 8</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="thresholdsTableBody">
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <div class="empty-state hidden" id="thresholdsEmptyState">
+                            <p>No students need attention. All emails have been sent!</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- History View -->
+                <div class="threshold-view" id="historyView">
+                    <div class="table-section hidden" id="historyTableSection">
+                        <div class="table-header">
+                            <span class="record-count" id="historyRecordCount">0 students</span>
+                        </div>
+                        
+                        <div class="table-wrapper">
+                            <table id="historyTable">
+                                <thead>
+                                    <tr>
+                                        <th>Student Name</th>
+                                        <th>Grade</th>
+                                        <th>Block 1</th>
+                                        <th>Block 2</th>
+                                        <th>Block 3</th>
+                                        <th>Block 4</th>
+                                        <th>Block 5</th>
+                                        <th>Block 6</th>
+                                        <th>Block 7</th>
+                                        <th>Block 8</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="historyTableBody">
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <div class="empty-state hidden" id="historyEmptyState">
+                            <p>No students have reached the absence threshold.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="empty-state" id="thresholdsNoData">
+                    <p>Please import both attendance and enrollment data to view thresholds.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Email Templates Page -->
+        <div class="page-view" id="emailTemplatesPage">
+            <div class="section-wrapper">
+                <h2 class="section-title">Email Templates</h2>
+                <p class="section-description">Manage email templates for each absence threshold. Paste your template from Google Docs below. Use placeholders like <code>&lt;&lt;Student First&gt;&gt;</code>, <code>&lt;&lt;Block 1 Course&gt;&gt;</code>, etc. for mail merge.</p>
+                
+                <!-- BCC Configuration -->
+                <div class="bcc-config-section">
+                    <h3 class="bcc-config-title">BCC Recipients (by threshold)</h3>
+                    <p class="bcc-config-description">Configure static BCC recipients for each threshold level. Separate multiple emails with commas.</p>
+                    <div class="bcc-config-grid">
+                        <div class="bcc-config-field">
+                            <label for="bcc6th">6 Absences BCC:</label>
+                            <input type="text" id="bcc6th" placeholder="admin@school.edu, counselor@school.edu">
+                        </div>
+                        <div class="bcc-config-field">
+                            <label for="bcc8th">8 Absences BCC:</label>
+                            <input type="text" id="bcc8th" placeholder="admin@school.edu, principal@school.edu">
+                        </div>
+                        <div class="bcc-config-field">
+                            <label for="bcc10th">10 Absences BCC:</label>
+                            <input type="text" id="bcc10th" placeholder="admin@school.edu, principal@school.edu">
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Threshold Tabs -->
+                <nav class="grade-tabs">
+                    <button class="grade-tab active" data-grade="6th">6 Absences</button>
+                    <button class="grade-tab" data-grade="8th">8 Absences</button>
+                    <button class="grade-tab" data-grade="10th">10 Absences</button>
+                </nav>
+
+                <!-- 6 Absences Template -->
+                <div class="grade-view active" id="grade6thView">
+                    <div class="template-container">
+                        <div class="template-header">
+                            <h3>6 Absences Email Template</h3>
+                            <div class="template-actions">
+                                <button class="btn-copy" data-template="6th" title="Copy template to clipboard">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                    </svg>
+                                    Copy
+                                </button>
+                                <span class="save-indicator" id="saveIndicator6th">Saved</span>
+                            </div>
+                        </div>
+                        <div class="template-editor" contenteditable="true" id="template6th" data-placeholder="Paste your 6 absences email template here..."></div>
+                    </div>
+                </div>
+
+                <!-- 8 Absences Template -->
+                <div class="grade-view" id="grade8thView">
+                    <div class="template-container">
+                        <div class="template-header">
+                            <h3>8 Absences Email Template</h3>
+                            <div class="template-actions">
+                                <button class="btn-copy" data-template="8th" title="Copy template to clipboard">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                    </svg>
+                                    Copy
+                                </button>
+                                <span class="save-indicator" id="saveIndicator8th">Saved</span>
+                            </div>
+                        </div>
+                        <div class="template-editor" contenteditable="true" id="template8th" data-placeholder="Paste your 8 absences email template here..."></div>
+                    </div>
+                </div>
+
+                <!-- 10 Absences Template -->
+                <div class="grade-view" id="grade10thView">
+                    <div class="template-container">
+                        <div class="template-header">
+                            <h3>10 Absences Email Template</h3>
+                            <div class="template-actions">
+                                <button class="btn-copy" data-template="10th" title="Copy template to clipboard">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                    </svg>
+                                    Copy
+                                </button>
+                                <span class="save-indicator" id="saveIndicator10th">Saved</span>
+                            </div>
+                        </div>
+                        <div class="template-editor" contenteditable="true" id="template10th" data-placeholder="Paste your 10 absences email template here..."></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Email Preview Modal -->
+        <div class="modal-overlay hidden" id="emailModal">
+            <div class="modal">
+                <div class="modal-header">
+                    <div class="modal-header-info">
+                        <h2>Email Preview</h2>
+                        <span class="modal-student-name" id="modalStudentName"></span>
+                    </div>
+                    <button class="modal-close" id="modalClose">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <p class="modal-instructions"><strong>Open in Gmail</strong> will copy the formatted email to your clipboard, open Gmail with recipients pre-filled, then you just paste (Cmd+V / Ctrl+V) the email body.</p>
+                    <!-- Email preview -->
+                    <div class="email-preview-container">
+                        <div class="email-preview-header">
+                            <div class="email-field">
+                                <label>To:</label>
+                                <span id="emailTo">-</span>
+                            </div>
+                            <div class="email-field">
+                                <label>CC:</label>
+                                <span id="emailCc" class="email-recipients-list">-</span>
+                            </div>
+                            <div class="email-field">
+                                <label>BCC:</label>
+                                <span id="emailBcc" class="email-recipients-list">-</span>
+                            </div>
+                            <div class="email-field">
+                                <label>Subject:</label>
+                                <input type="text" id="emailSubject" value="Attendance Notification - Action Required">
+                            </div>
+                        </div>
+                        <div class="email-preview-body" id="emailPreviewBody">
+                            <p class="empty-preview">Loading email...</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn-primary" id="btnOpenMail">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                            <polyline points="22,6 12,13 2,6"></polyline>
+                        </svg>
+                        Open Gmail (Copy + Paste)
+                    </button>
+                    <button class="btn-success" id="btnMarkSent">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                        Mark as Sent
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Clear Data Confirmation Modal -->
+        <div class="modal-overlay hidden" id="clearDataModal">
+            <div class="modal modal-small">
+                <div class="modal-header">
+                    <h2>Clear All Data</h2>
+                    <button class="modal-close" id="clearModalClose">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <p class="warning-text">⚠️ Are you sure you want to clear all data?</p>
+                    <p>This will permanently remove all attendance records, enrollments, and settings. Email templates will be preserved.</p>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn-secondary" id="clearDataCancel">Cancel</button>
+                    <button class="btn-danger" id="clearDataConfirm">Clear All Data</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>© 2025 Attendance Tracker</p>
+        </footer>
+    </div>
+
+    <script src="appfeatures.js"></script>
+</body>
+</html>
