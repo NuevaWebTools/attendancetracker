@@ -367,14 +367,14 @@ function applyFilters() {
         
         // Date range
         if (DOM.filterStartDate && DOM.filterStartDate.value) {
-            const rowDate = new Date(row.Attendance_Date);
-            const startDate = new Date(DOM.filterStartDate.value);
-            if (rowDate < startDate) return false;
+            const rowDate = parseLocalDate(row.Attendance_Date);
+            const startDate = parseLocalDate(DOM.filterStartDate.value);
+            if (rowDate && startDate && rowDate < startDate) return false;
         }
         if (DOM.filterEndDate && DOM.filterEndDate.value) {
-            const rowDate = new Date(row.Attendance_Date);
-            const endDate = new Date(DOM.filterEndDate.value);
-            if (rowDate > endDate) return false;
+            const rowDate = parseLocalDate(row.Attendance_Date);
+            const endDate = parseLocalDate(DOM.filterEndDate.value);
+            if (rowDate && endDate && rowDate > endDate) return false;
         }
         // Grade
         if (DOM.filterGrade && DOM.filterGrade.value && row.Grade !== DOM.filterGrade.value) return false;
@@ -453,8 +453,8 @@ function compareValues(a, b, column, direction) {
         valA = `${a.Student_First || ''} ${a.Student_Last || ''}`.trim().toLowerCase();
         valB = `${b.Student_First || ''} ${b.Student_Last || ''}`.trim().toLowerCase();
     } else if (column === 'Attendance_Date') {
-        valA = new Date(a[column] || '');
-        valB = new Date(b[column] || '');
+        valA = parseLocalDate(a[column]) || new Date(0);
+        valB = parseLocalDate(b[column]) || new Date(0);
         return direction === 'asc' ? valA - valB : valB - valA;
     } else if (column === 'Grade') {
         valA = parseInt(a[column]) || 0;
@@ -1653,10 +1653,32 @@ function getTypeClass(type) {
     return 'type-other';
 }
 
+// Parse a date string as LOCAL time to avoid UTC timezone shifts.
+// Handles YYYY-MM-DD, YYYY/MM/DD, M/D/YY, M/D/YYYY, MM/DD/YYYY, etc.
+function parseLocalDate(dateStr) {
+    if (!dateStr) return null;
+    const s = String(dateStr).trim();
+    // ISO-like: YYYY-MM-DD or YYYY/MM/DD (optional time ignored for date-only)
+    let m = s.match(/^(\d{4})[-\/](\d{1,2})[-\/](\d{1,2})$/);
+    if (m) {
+        return new Date(parseInt(m[1]), parseInt(m[2]) - 1, parseInt(m[3]));
+    }
+    // US-style: M/D/YY or M/D/YYYY (also supports dashes)
+    m = s.match(/^(\d{1,2})[\/-](\d{1,2})[\/-](\d{2,4})$/);
+    if (m) {
+        let year = parseInt(m[3]);
+        if (year < 100) year += year < 70 ? 2000 : 1900;
+        return new Date(year, parseInt(m[1]) - 1, parseInt(m[2]));
+    }
+    // Fallback: let JS try (may still have TZ issues for ISO, but better than nothing)
+    const d = new Date(s);
+    return isNaN(d) ? null : d;
+}
+
 function formatDate(dateStr) {
     if (!dateStr) return '-';
-    const date = new Date(dateStr);
-    if (isNaN(date)) return dateStr;
+    const date = parseLocalDate(dateStr);
+    if (!date || isNaN(date)) return dateStr;
     return date.toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' });
 }
 
